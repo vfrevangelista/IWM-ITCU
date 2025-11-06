@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Identification Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .game-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    width: 350px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 22px;
+  }
+  .option {
+    display: block;
+    background: #e0e7ff;
+    border: none;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .option:hover {
+    background: #c7d2fe;
+  }
+  .hidden {
+    display: none;
+  }
+  .result {
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 20px;
+  }
+  .back-button {
+    margin-top: 20px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .back-button:hover {
+    background: #4338ca;
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1 id="question-text">Loading...</h1>
+  <div id="options"></div>
+  <div id="result" class="result hidden"></div>
+  <button id="back-btn" class="back-button hidden">Back to Interactive Map</button>
+</div>
+
+<script>
+const questions = [
+  { question: "What is the acronym of DOST?", options: ["Department of Science Technology", "Department of Sleep Tale", "Department of Science and Technology", "Department of Siksik and Tavern"], correct: 2 },
+  { question: "Which country does DOST collaborate with?", options: ["Haiti", "Egypt", "North Korea", "France"], correct: 3 },
+  { question: "Which bilateral partner does Sandwich Scholarship Program?", options: ["Canada", "Taiwan", "India", "China"], correct: 1 },
+  { question: "Which area of study does South Korea priorities?", options: ["Health", "Engineering", "Information Technology (IT)", "Nuclear"], correct: 0 },
+  { question: "Which one is a country?", options: ["Tree", "River", "Italy", "Mountain"], correct: 2 },
+  { question: "who is the Secretary of DOST?", options: ["Sec. Renato U. Solidum, Jr.", "Sec. Arthur T. Gumabao", "Sec. Leah J. Buendia", "Sec. Renato U. Solidum, Sr."], correct: 0 },
+  { question: "What countries composes ASEAN CLM?", options: ["Cambodia-Lao PDR-Myanmar", "Canada-Laoag-Manila", "China-Lithuania-Malaysia", "Cambodia-Libia-Mexico"], correct: 0 },
+  { question: "Which country has still monarchy?", options: ["Philippines", "Japan", "Singapore", "USA"], correct: 0 },
+  { question: "NSTW 2025 is being held at?", options: ["Iloilo City", "Cagayan de Oro", "Manila", "Laoag City"], correct: 3 },
+  { question: "What is the acronym of ITCU?", options: ["International Technology Commerce Unit", "International Technical Cooperation Division", "International Cooperation Unit", "International Technology Cooperation Unit"], correct: 4 },
+];
+
+let selectedQuestions = [];
+let current = 0;
+let score = 0;
+
+// Randomly select 2 questions
+function getRandomQuestions() {
+  let shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, 2);
+}
+
+function showQuestion() {
+  const q = selectedQuestions[current];
+  document.getElementById("question-text").textContent = `Q${current + 1}. ${q.question}`;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = `${String.fromCharCode(65 + i)}. ${opt}`;
+    btn.className = "option";
+    btn.onclick = () => checkAnswer(i);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected) {
+  const q = selectedQuestions[current];
+  if (selected === q.correct) score++;
+
+  current++;
+  if (current < selectedQuestions.length) {
+    showQuestion();
+  } else {
+    endGame();
+  }
+}
+
+function endGame() {
+  document.getElementById("question-text").textContent = "Game Over!";
+  document.getElementById("options").innerHTML = "";
+  const resultDiv = document.getElementById("result");
+  resultDiv.textContent = `Your score: ${score} / ${selectedQuestions.length}`;
+  resultDiv.classList.remove("hidden");
+
+  // Show back to map button
+  const backBtn = document.getElementById("back-btn");
+  backBtn.classList.remove("hidden");
+
+  // Change this link to your map page filename or URL
+  backBtn.onclick = () => window.location.href = "Interactive Map.html";
+}
+
+// Start game
+selectedQuestions = getRandomQuestions();
+showQuestion();
+</script>
+
+</body>
+</html>
