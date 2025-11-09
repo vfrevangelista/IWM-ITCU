@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITCU Interactive Experience</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  height: 100%;
+  width: 100%;
+  background: #013a63;
+}
+
+/* Section controller */
+.section {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease-in-out;
+}
+.section.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Landing */
+#landing {
+  background: #013a63;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#landing img {
+  width: 90%;
+  max-width: 900px;
+  cursor: pointer;
+  transition: transform .25s ease;
+}
+#landing img:hover { transform: scale(1.05); }
+#landing p { color: white; }
+
+/* Map */
+#map {
+  width: 100%;
+  height: 100%;
+  background-color: #c8e6f5;
+}
+
+/* Game */
+#game {
+  background: #f0f4f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.game-container {
+  background: white;
+  padding: 30px;
+  width: 350px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  text-align: center;
+}
+.option {
+  display: block;
+  background: #e0e7ff;
+  border: none;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.back-button {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+/* Map Play Button */
+.play-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 1000;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LANDING -->
+<div id="landing" class="section active">
+  <div class="container">
+    <img src="landingpage.png" onclick="openMap()">
+   
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map-section" class="section">
+  <div id="map"></div>
+  <button class="play-btn" onclick="openGame()">Ready to Play</button>
+</div>
+
+<!-- GAME -->
+<div id="game" class="section">
+  <div class="game-container">
+    <h1 id="question-text">Loading...</h1>
+    <div id="options"></div>
+    <div id="result" class="hidden"></div>
+    <button id="back-btn" class="back-button" onclick="openMap()">Back to Interactive Map</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function openMap() { showSection("map-section"); }
+function openGame() { showSection("game"); }
+
+/* ---------- MAP CODE (unchanged) ---------- */
+const map = L.map('map', {
+  worldCopyJump: false,
+  noWrap: true,
+  minZoom: 2,
+  maxZoom: 6,
+  zoomSnap: 0.25,
+  zoomDelta: 0.5
+}).setView([20, 0], 3);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+  maxZoom: 6, minZoom: 2, noWrap: true
+}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
+  maxZoom: 6, minZoom: 2, noWrap: true
+}).addTo(map);
+
+const allowedCountries = ['Italy','United Kingdom','Australia','Japan','United States of America','Canada','Cambodia','Laos','Myanmar','France','Taiwan','South Korea','Philippines','India','China','East Asia'];
+
+const shortInfo = {
+  "Philippines": {capital:"Manila", detail:"", note:[["Region","Southeast Asia","English","Currency","Peso (PHP)"]]},
+  "United States of America":{capital:"Washington, D.C.",detail:"The partnership...",note:[["3","On-going","PHD"]]},
+  "Japan":{capital:"Tokyo",detail:"The top partnership...",note:[["9","On-going","PHD"]]},
+  "France":{capital:"Paris",detail:"The partnership...",note:[["97","On-going","MS"],["19","On-going","PHD"]]},
+  "India":{capital:"New Delhi",detail:"The partnership...",note:[["Artificial Intelligence","1"],["Enginnering","1"],["Health","1"]]},
+  "Australia":{capital:"Canberra",detail:"The top partnership...",note:[["17","Graduated","MS"],["11","On-going","MS"],["28","On-going","PHD"]]},
+  "United Kingdom":{capital:"London",detail:"The top partnership...",note:[["10","Graduated","PHD"],["5","On-going","PHD"]]},
+  "Italy":{capital:"Rome",detail:"The partnership...",note:[["2","Graduated","PHD"],["6","On-going","PHD"]]},
+  "Canada":{capital:"Ottawa",detail:"The partnership...",note:[["1","Graduated","MS"],["6","On-going","MS"],["9","On-going","PHD"]]},
+  "China":{capital:"Beijing",detail:"The partnership...",note:[["Agriculture","1"],["Enegry","1"],["Health","1"]]},
+  "South Korea":{capital:"Seoul",detail:"The top partnership...",note:[["Agriculture","1"],["Climate and Weather","1"],["Energy","1"],["Health","1"]]},
+  "Taiwan":{capital:"Taipei",detail:"The top partnership...",note:[["4","Finished","BS/MS"],["81","Finished","MS"],["20","Finished","PHD"]]},
+  "Cambodia":{capital:"Phnom Penh",detail:"The partnership...",note:[["12","On-going","MS"]]},
+  "Laos":{capital:"Vientiane",detail:"The partnership...",note:[["3","On-going","PHD"],["3","On-going","PHD"]]},
+  "Myanmar":{capital:"Naypyidaw",detail:"The partnership...",note:[["15","On-going","PHD"],["17","On-going","PHD"]]},
+};
+
+let globalView = map.getCenter();
+let globalZoom = map.getZoom();
+
+fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+.then(res => res.json()).then(data => {
+  L.geoJSON(data, {
+    style: f => allowedCountries.includes(f.properties.name)
+      ? {color:'#007BFF',weight:1.5,fillOpacity:0.4}
+      : {color:'#ccc',weight:0.5,fillOpacity:0.05},
+    onEachFeature: (f,l) => {
+      if (allowedCountries.includes(f.properties.name)) {
+        l.on({
+          click: e => {
+            map.flyToBounds(l.getBounds(), {padding:[40,40],duration:1});
+            showPopup(f,e.latlng);
+          }
+        });
+      }
+    }
+  }).addTo(map);
+});
+
+function showPopup(feature, latlng) {
+  const name = feature.properties.name;
+  const info = shortInfo[name];
+  let html = `<b>${name}</b><br>`;
+  if(info){
+    html+=`Capital: ${info.capital}<br>Detail: ${info.detail}<br>`;
+    html+=`<table><tr><th>No.</th><th>Status</th><th>Level</th></tr>`;
+    info.note.forEach(r=>html+=`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+    html+=`</table>`;
+  }
+  L.popup({maxWidth:300}).setLatLng(latlng).setContent(html).openOn(map);
+  map.once('popupclose',()=>map.flyTo(globalView,globalZoom,{duration:1}));
+}
+
+/* ---------- GAME CODE (unchanged) ---------- */
+const questions=[
+{question:"What is the acronym of DOST?",options:["Department of Science Technology","Department of Sleep Tale","Department of Science and Technology","Department of Siksik and Tavern"],correct:2},
+{question:"Which country does DOST collaborate with?",options:["Haiti","Egypt","North Korea","France"],correct:3},
+{question:"Which bilateral partner does Sandwich Scholarship Program?",options:["Canada","Taiwan","India","China"],correct:1},
+{question:"Which area of study does South Korea priorities?",options:["Health","Engineering","Information Technology (IT)","Nuclear"],correct:0},
+{question:"Which one is a country?",options:["Tree","River","Italy","Mountain"],correct:2},
+{question:"who is the Secretary of DOST?",options:["Sec. Renato U. Solidum, Jr.","Sec. Arthur T. Gumabao","Sec. Leah J. Buendia","Sec. Renato U. Solidum, Sr."],correct:0},
+{question:"What countries composes ASEAN CLM?",options:["Cambodia-Lao PDR-Myanmar","Canada-Laoag-Manila","China-Lithuania-Malaysia","Cambodia-Libia-Mexico"],correct:0},
+{question:"Which country has still monarchy?",options:["Philippines","Japan","Singapore","USA"],correct:0},
+{question:"NSTW 2025 is being held at?",options:["Iloilo City","Cagayan de Oro","Manila","Laoag City"],correct:3},
+{question:"What is the acronym of ITCU?",options:["International Technology Commerce Unit","International Technical Cooperation Division","International Cooperation Unit","International Technology Cooperation Unit"],correct:3},
+];
+
+let selectedQuestions=[],current=0,score=0;
+
+function getRandomQuestions(){return [...questions].sort(()=>0.5-Math.random()).slice(0,2);}
+function showQuestion(){
+  const q=selectedQuestions[current];
+  document.getElementById("question-text").textContent="Q"+(current+1)+". "+q.question;
+  const optDiv=document.getElementById("options"); optDiv.innerHTML="";
+  q.options.forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.textContent=String.fromCharCode(65+i)+". "+o;
+    b.onclick=()=>checkAnswer(i);
+    optDiv.appendChild(b);
+  });
+}
+function checkAnswer(i){
+  if(i===selectedQuestions[current].correct)score++;
+  current++;
+  current<selectedQuestions.length?showQuestion():endGame();
+}
+function endGame(){
+  document.getElementById("question-text").textContent="Game Over!";
+  document.getElementById("options").innerHTML="";
+  document.getElementById("result").textContent=`Score: ${score}/${selectedQuestions.length}`;
+}
+selectedQuestions=getRandomQuestions(); showQuestion();
+</script>
+
+</body>
+</html>
