@@ -255,21 +255,21 @@
     let selectedQuestions = [], current = 0, score = 0;
 
    const questions = [
-  { question: "What is the acronym of DOST?", options: ["Department of Science Technology", "Department of Sleep Tale", "Department of Science and Technology", "Department of Siksik and Tavern"], correct: 3 },
-  { question: "Which country does DOST collaborate with?", options: ["Haiti", "Egypt", "North Korea", "France"], correct: 3 },
+  { question: "What is the acronym of DOST?", options: ["Department of Science Technology", "Department of Signs and Techniques", "Department of Science and Technology", "Department of Skills and Training"], correct: 3 },
+  { question: "Which country does DOST collaborate with?", options: ["Haiti", "Egypt", "Iceland", "France"], correct: 3 },
   { question: "Which bilateral partner does Sandwich Scholarship Program?", options: ["Canada", "Taiwan", "India", "China"], correct: 1 },
   { question: "Which area of study does South Korea priorities?", options: ["Health", "Engineering", "Information Technology (IT)", "Nuclear"], correct: 0 },
-  { question: "Which one is a country?", options: ["Tree", "River", "Italy", "Mountain"], correct: 2 },
+  { question: "Which one is a country from Europe?", options: ["Maldives", "France", "Italy", "Russia"], correct: 2 },
   { question: "who is the Secretary of DOST?", options: ["Sec. Renato U. Solidum, Jr.", "Sec. Arthur T. Gumabao", "Sec. Leah J. Buendia", "Sec. Renato U. Solidum, Sr."], correct: 0 },
   { question: "What countries composes ASEAN CLM?", options: ["Cambodia-Lao PDR-Myanmar", "Canada-Laoag-Manila", "China-Lithuania-Malaysia", "Cambodia-Libia-Mexico"], correct: 0 },
-  { question: "Which country has still monarchy?", options: ["Philippines", "Japan", "Singapore", "USA"], correct: 0 },
-  { question: "NSTW 2025 is being held at?", options: ["Iloilo City", "Cagayan de Oro", "Manila", "Laoag City"], correct: 4 },
-  { question: "What is the acronym of ITCU?", options: ["International Technology Commerce Unit", "International Technical Cooperation Division", "International Cooperation Unit", "International Technology Cooperation Unit"], correct: 4 },
+  { question: "Which country has still monarchy?", options: ["Philippines", "Japan", "Singapore", "USA"], correct: 1 },
+  { question: "NSTW 2025 is being held at?", options: ["Iloilo City", "Cagayan de Oro", "Manila", "Laoag City"], correct: 3 },
+  { question: "What is the acronym of ITCU?", options: ["International Technology Commerce Unit", "International Technical Cooperation Division", "International Cooperation Unit", "International Technology Cooperation Unit"], correct: 3 },
 ];
 
    function getRandomQuestions() {
   let shuffled = [...questions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 2);
+  return shuffled.slice(0, 3);
 }
 
     function showQuestion() {
@@ -323,6 +323,7 @@
   </script>
 </body>
 </html>
+
 
 
 
