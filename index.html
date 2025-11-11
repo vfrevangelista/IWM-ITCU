@@ -1,184 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interactive Map - ITCU</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Map - ITCU</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
 
-    /* ===== LANDING PAGE ===== */
-    .landing {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-      cursor: pointer;
-      overflow: hidden;
-      z-index: 1000;
-    }
+/* ===== LANDING PAGE ===== */
+.landing {
+  position: fixed; inset: 0; display: flex; justify-content: center; align-items: center;
+  background: #000; cursor: pointer; overflow: hidden; z-index: 1000;
+}
+.landing::before {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: 100vw; height: 56.25vw; max-height: 100vh;
+  transform: translate(-50%, -50%);
+  background: url('your-image.jpg') center center / cover no-repeat; z-index: -1;
+}
+.overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.landing-content { position: relative; color: white; text-align: center; z-index: 1; padding: 20px; }
+.landing-content h1 { font-size: 2.5rem; margin-bottom: 10px; }
+.landing-content p { font-size: 1.2rem; }
+@media (max-aspect-ratio:16/9){.landing::before{width:177.78vh;height:100vh;}}
 
-    .landing::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 56.25vw; /* 16:9 ratio */
-      max-height: 100vh;
-      transform: translate(-50%, -50%);
-      background: url('your-image.jpg') center center / cover no-repeat;
-      z-index: -1;
-    }
+/* ===== TOP PANEL ===== */
+#topPanel {
+  position: fixed; top:0; left:0; width:100%; padding:8px 20px; display:flex; justify-content:flex-end; align-items:center; gap:10px;
+  z-index:1001; backdrop-filter: blur(10px); background: rgba(255,255,255,0.5); border-bottom: 1px solid rgba(200,200,200,0.3);
+  display: none;
+}
+#topPanel .panel-btn {
+  background-color: rgba(255,255,255,0.3);
+  color: #333;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+#topPanel .panel-btn:hover {
+  background-color: rgba(0,123,255,0.2);
+  color: #007bff;
+}
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
-    }
+/* ===== MAP SECTION ===== */
+#map { height: 100%; width: 100%; display: none; background-color: #c8e6f5; }
+.popup-content { font-size: 14px; line-height: 1.5; }
+table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
+th { background-color: #f4f4f4; }
 
-    .landing-content {
-      position: relative;
-      color: white;
-      text-align: center;
-      z-index: 1;
-      padding: 20px;
-    }
+/* ===== LEAFLET CONTROL ADJUST ===== */
+.leaflet-top.leaflet-left { top: 70px !important; }
+.leaflet-control-fullscreen,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background: rgba(0,0,0,0.6); color: white; font-size: 18px; width: 32px; height: 32px;
+  line-height: 32px; text-align: center; border-radius: 4px; cursor: pointer; user-select: none;
+}
+.leaflet-control-fullscreen:hover,
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover { background: rgba(0,0,0,0.8); }
 
-    .landing-content h1 { font-size: 2.5rem; margin-bottom: 10px; }
-    .landing-content p { font-size: 1.2rem; }
+/* ===== GAME SECTION ===== */
+#game-section { display: none; background: #f0f4f8; height: 100vh; display: flex; justify-content: center; align-items: center; }
+.game-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 350px; text-align: center; }
+.option { display: block; background: #e0e7ff; border: none; margin: 8px 0; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+.option:hover { background: #c7d2fe; }
+.hidden { display: none; }
+.result { font-weight: bold; font-size: 20px; margin-top: 20px; }
+.back-button { margin-top: 20px; background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.back-button:hover { background: #4338ca; }
 
-    @media (max-aspect-ratio: 16/9) {
-      .landing::before { width: 177.78vh; height: 100vh; }
-    }
-
-    /* ===== MAP SECTION ===== */
-    #map { height: 100%; width: 100%; display: none; background-color: #c8e6f5; }
-
-    .popup-content { font-size: 14px; line-height: 1.5; }
-    table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-    th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
-    th { background-color: #f4f4f4; }
-
-    .play-btn {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      z-index: 1001;
-      transition: background-color 0.2s ease;
-      display: none;
-    }
-    .play-btn:hover { background-color: #0056b3; }
-
-    .leaflet-control-fullscreen {
-      background: rgba(0,0,0,0.6);
-      color: white;
-      font-size: 20px;
-      width: 32px;
-      height: 32px;
-      line-height: 30px;
-      text-align: center;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .leaflet-control-fullscreen:hover { background: rgba(0,0,0,0.8); }
-
-    /* ===== GAME SECTION ===== */
-    #game-section {
-      display: none;
-      background: #f0f4f8;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .game-container {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      width: 350px;
-      text-align: center;
-    }
-    .option {
-      display: block;
-      background: #e0e7ff;
-      border: none;
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .option:hover { background: #c7d2fe; }
-    .hidden { display: none; }
-    .result { font-weight: bold; font-size: 20px; margin-top: 20px; }
-    .back-button {
-      margin-top: 20px;
-      background: #4f46e5;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .back-button:hover { background: #4338ca; }
-  </style>
+/* ===== OVERLAY FULLSCREEN ===== */
+.overlay-full { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:9999; }
+.overlay-content { position: relative; max-width: 90%; max-height: 90%; text-align:center; }
+.overlay-img { width:600px; height:1200px; border-radius: 6px; box-shadow:0 0 20px rgba(255,255,255,0.15);}
+.close-btn { position: absolute; top:-10px; right:-10px; background: rgba(0,0,0,0.7); color:white; padding: 8px 12px; border-radius:50%; font-size:18px; cursor:pointer; user-select:none;}
+.close-btn:hover{background: rgba(0,0,0,1);}
+.nav-btn { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,0.5); color:white; border:none; padding:10px 16px; border-radius:50%; font-size:24px; cursor:pointer; user-select:none; }
+.nav-btn:hover{ background: rgba(0,0,0,0.8);}
+.nav-prev { left:-40px; }
+.nav-next { right:-40px; }
+</style>
 </head>
 <body>
-  <!-- LANDING PAGE -->
-  <div class="landing" id="landing">
-    <div class="overlay"></div>
-    <div class="landing-content">
-      <img src="landingpage.png" width="600px" height=1200px" alt="landingpage"> 
-      <!-- <h1>Welcome to ITCU Interactive World Map</h1> -->
-      <p>Click anywhere to begin exploring.</p>
-    </div>
+
+<!-- LANDING PAGE -->
+<div class="landing" id="landing">
+  <div class="overlay"></div>
+  <div class="landing-content">
+    <img src="landingpage.png" width="600px" height="1200px" alt="landingpage">
+    <p>Click anywhere to begin exploring.</p>
   </div>
+</div>
 
-  <!-- MAP SECTION -->
-  <div id="map"></div>
-  <button id="playBtn" class="play-btn">Play</button>
+<!-- TOP PANEL -->
+<div id="topPanel">
+  <button id="playBtn" class="panel-btn">Play</button>
+  <button id="homeBtn" class="panel-btn">Home</button>
+  <button id="overviewBtn" class="panel-btn">Overview</button>
+  <button id="unescoBtn" class="panel-btn">UNESCO</button>
+</div>
 
-  <!-- GAME SECTION -->
-  <div id="game-section">
-    <div class="game-container">
-      <h1 id="question-text">Loading...</h1>
-      <div id="options"></div>
-      <div id="result" class="result hidden"></div>
-      <button id="back-btn" class="back-button hidden">Back to Interactive Map</button>
-    </div>
+<!-- MAP SECTION -->
+<div id="map"></div>
+
+<!-- GAME SECTION -->
+<div id="game-section">
+  <div class="game-container">
+    <h1 id="question-text">Loading...</h1>
+    <div id="options"></div>
+    <div id="result" class="result hidden"></div>
+    <button id="back-btn" class="back-button hidden">Back to Interactive Map</button>
   </div>
+</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script>
-    // ===== LANDING PAGE LOGIC =====
-    const landing = document.getElementById("landing");
-    const mapDiv = document.getElementById("map");
-    const playBtn = document.getElementById("playBtn");
+<!-- OVERVIEW OVERLAY -->
+<div id="overviewOverlay" class="overlay-full">
+  <div class="overlay-content">
+    <span class="close-btn" id="closeOverview">✖</span>
+    <img src="overview.png" class="overlay-img" alt="Overview">
+  </div>
+</div>
 
-    landing.addEventListener("click", () => {
-      landing.style.display = "none";
-      mapDiv.style.display = "block";
-      playBtn.style.display = "block";
-      map.invalidateSize();
-    });
+<!-- UNESCO OVERLAY -->
+<div id="unescoOverlay" class="overlay-full">
+  <div class="overlay-content">
+    <span class="close-btn" id="closeUnesco">✖</span>
+    <img src="unesco1.jpg" class="overlay-img" id="unescoImg">
+    <button class="nav-btn nav-prev" id="prevUnesco">&lt;</button>
+    <button class="nav-btn nav-next" id="nextUnesco">&gt;</button>
+  </div>
+</div>
 
-    // ===== MAP INITIALIZATION =====
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+// ===== ELEMENTS =====
+const landing = document.getElementById("landing");
+const mapDiv = document.getElementById("map");
+const topPanel = document.getElementById("topPanel");
+const playBtn = document.getElementById("playBtn");
+const homeBtn = document.getElementById("homeBtn");
+const overviewBtn = document.getElementById("overviewBtn");
+const unescoBtn = document.getElementById("unescoBtn");
+
+const overviewOverlay = document.getElementById("overviewOverlay");
+const closeOverview = document.getElementById("closeOverview");
+
+const unescoOverlay = document.getElementById("unescoOverlay");
+const closeUnesco = document.getElementById("closeUnesco");
+const unescoImg = document.getElementById("unescoImg");
+const prevUnesco = document.getElementById("prevUnesco");
+const nextUnesco = document.getElementById("nextUnesco");
+
+const unescoPics = ['unesco1.jpg','unesco2.jpg'];
+let unescoIndex = 0;
+
+// ===== LANDING PAGE =====
+landing.addEventListener("click", ()=>{
+  landing.style.display="none"; 
+  mapDiv.style.display="block"; 
+  topPanel.style.display="flex";
+  map.invalidateSize();
+});
+
+ // ===== MAP INITIALIZATION =====
     const map = L.map('map', { worldCopyJump: false, noWrap: true, minZoom: 2, maxZoom: 6 }).setView([20, 0], 3);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -233,29 +224,77 @@
         }).addTo(map);
       });
 
-    function showPopup(feature, latlng) {
-      const name = feature.properties.name;
-      const info = shortInfo[name];
-      let html = `<div class='popup-content'><h3>${name}</h3>`;
-      if (info) {
-        html += `<b>Capital:</b> ${info.capital}<br><b>Details:</b> ${info.detail}`;
-        html += `<table><tr><th>No. of Students</th><th>Status</th><th>Level</th></tr>`;
-        info.note.forEach(([a,b,c]) => html += `<tr><td>${a}</td><td>${b}</td><td>${c}</td></tr>`);
-        html += `</table>`;
-      } else html += `No data available.`;
-      html += `</div>`;
-      const popup = L.popup({maxWidth: 320}).setLatLng(latlng).setContent(html).openOn(map);
-      map.once('popupclose', () => map.flyTo(globalView, globalZoom, {duration: 1.5}));
-    }
 
-    // ===== GAME LOGIC =====
+// Fullscreen control
+const fullscreenControl=L.control({position:'topleft'});
+fullscreenControl.onAdd=function(){
+  const div=L.DomUtil.create('div','leaflet-control-fullscreen');
+  div.innerHTML="⛶"; div.title="Toggle Fullscreen";
+  div.onclick=function(){ 
+    if(!document.fullscreenElement){document.documentElement.requestFullscreen(); div.innerHTML="✖";}
+    else {document.exitFullscreen(); div.innerHTML="↗";}
+  };
+  return div;
+};
+fullscreenControl.addTo(map);
+document.addEventListener('fullscreenchange',()=>{ const btn=document.querySelector('.leaflet-control-fullscreen'); if(!document.fullscreenElement) btn.innerHTML="↗"; });
+
+// ===== BUTTONS =====
+homeBtn.addEventListener("click",()=>{ 
+  mapDiv.style.display="none"; 
+  topPanel.style.display="none"; 
+  landing.style.display="flex"; 
+});
+
+overviewBtn.addEventListener("click",()=>{ 
+  overviewOverlay.style.display="flex"; 
+  map.dragging.disable(); map.touchZoom.disable(); map.scrollWheelZoom.disable(); map.doubleClickZoom.disable(); 
+});
+closeOverview.addEventListener("click",()=>{ 
+  overviewOverlay.style.display="none"; 
+  map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable(); 
+});
+overviewOverlay.addEventListener("click", e=>{ 
+  if(e.target===overviewOverlay){ 
+    overviewOverlay.style.display="none"; 
+    map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable(); 
+  } 
+});
+
+// ===== UNESCO BUTTON =====
+unescoBtn.addEventListener("click", ()=>{
+  unescoIndex = 0;
+  unescoImg.src = unescoPics[unescoIndex];
+  unescoOverlay.style.display = "flex";
+  map.dragging.disable(); map.touchZoom.disable(); map.scrollWheelZoom.disable(); map.doubleClickZoom.disable();
+});
+closeUnesco.addEventListener("click", ()=>{
+  unescoOverlay.style.display = "none";
+  map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
+});
+nextUnesco.addEventListener("click", ()=>{
+  unescoIndex = (unescoIndex + 1) % unescoPics.length;
+  unescoImg.src = unescoPics[unescoIndex];
+});
+prevUnesco.addEventListener("click", ()=>{
+  unescoIndex = (unescoIndex - 1 + unescoPics.length) % unescoPics.length;
+  unescoImg.src = unescoPics[unescoIndex];
+});
+unescoOverlay.addEventListener("click", e=>{
+  if(e.target===unescoOverlay){
+    unescoOverlay.style.display="none";
+    map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
+  }
+});
+
+// ===== GAME LOGIC =====
     const gameSection = document.getElementById("game-section");
     const backBtn = document.getElementById("back-btn");
     const resultDiv = document.getElementById("result");
     let selectedQuestions = [], current = 0, score = 0;
 
    const questions = [
-  { question: "What is the acronym of DOST?", options: ["Department of Science Technology", "Department of Signs and Techniques", "Department of Science and Technology", "Department of Skills and Training"], correct: 3 },
+  { question: "What is the acronym of DOST?", options: ["Department of Science Technology", "Department of Signs and Techniques", "Department of Science and Technology", "Department of Skills and Training"], correct: 2},
   { question: "Which country does DOST collaborate with?", options: ["Haiti", "Egypt", "Iceland", "France"], correct: 3 },
   { question: "Which bilateral partner does Sandwich Scholarship Program?", options: ["Canada", "Taiwan", "India", "China"], correct: 1 },
   { question: "Which area of study does South Korea priorities?", options: ["Health", "Engineering", "Information Technology (IT)", "Nuclear"], correct: 0 },
@@ -320,12 +359,6 @@
       current = 0; score = 0;
       showQuestion();
     });
-  </script>
+</script>
 </body>
 </html>
-
-
-
-
-
-
