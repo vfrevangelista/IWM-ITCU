@@ -1,175 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Interactive Map - ITCU</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive Map - ITCU</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
 
-/* ===== LANDING PAGE ===== */
-.landing {
-  position: fixed; inset: 0; display: flex; justify-content: center; align-items: center;
-  background: #000; cursor: pointer; overflow: hidden; z-index: 1000;
-}
-.landing::before {
-  content: ""; position: absolute; top: 50%; left: 50%;
-  width: 100vw; height: 56.25vw; max-height: 100vh;
-  transform: translate(-50%, -50%);
-  background: url('your-image.jpg') center center / cover no-repeat; z-index: -1;
-}
-.overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
-.landing-content { position: relative; color: white; text-align: center; z-index: 1; padding: 20px; }
-.landing-content h1 { font-size: 2.5rem; margin-bottom: 10px; }
-.landing-content p { font-size: 1.2rem; }
-@media (max-aspect-ratio:16/9){.landing::before{width:177.78vh;height:100vh;}}
+    /* ===== BUTTON CONTAINER ===== */
+    #topButtons {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 10px; /* equal spacing between buttons */
+      z-index: 1001;
+    }
 
-/* ===== TOP PANEL ===== */
-#topPanel {
-  position: fixed; top:0; left:0; width:100%; padding:8px 20px; display:flex; justify-content:flex-end; align-items:center; gap:10px;
-  z-index:1001; backdrop-filter: blur(10px); background: rgba(255,255,255,0.5); border-bottom: 1px solid rgba(200,200,200,0.3);
-  display: none;
+    /* ===== INDIVIDUAL BUTTONS ===== */
+    .map-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      transition: all 0.25s ease;
+      display: none; /* hidden until map loads */
+    }
+
+    /* ===== COLORS ===== */
+    #homeBtn {
+      background-color: #4CAF50; /* green */
+    }
+    #homeBtn:hover { background-color: #3e8e41; }
+
+    #unescoBtn {
+      background-color: #9C27B0; /* purple */
+    }
+    #unescoBtn:hover { background-color: #7B1FA2; }
+
+    #overviewBtn {
+      background-color: #FF9800; /* orange */
+    }
+    #overviewBtn:hover { background-color: #F57C00; }
+
+    #playBtn {
+      background-color: #2196F3; /* blue */
+    }
+    #playBtn:hover { background-color: #1976D2; }
+
+    #overviewOverlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-#topPanel .panel-btn {
-  background-color: rgba(255,255,255,0.3);
-  color: #333;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-#topPanel .panel-btn:hover {
-  background-color: rgba(0,123,255,0.2);
-  color: #007bff;
+#overviewOverlay[style*="display: flex"] {
+  opacity: 1;
 }
 
-/* ===== MAP SECTION ===== */
-#map { height: 100%; width: 100%; display: none; background-color: #c8e6f5; }
-.popup-content { font-size: 14px; line-height: 1.5; }
-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
-th { background-color: #f4f4f4; }
-
-/* ===== LEAFLET CONTROL ADJUST ===== */
-.leaflet-top.leaflet-left { top: 70px !important; }
-.leaflet-control-fullscreen,
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out {
-  background: rgba(0,0,0,0.6); color: white; font-size: 18px; width: 32px; height: 32px;
-  line-height: 32px; text-align: center; border-radius: 4px; cursor: pointer; user-select: none;
+#unescoOverlay {
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-.leaflet-control-fullscreen:hover,
-.leaflet-control-zoom-in:hover,
-.leaflet-control-zoom-out:hover { background: rgba(0,0,0,0.8); }
+#unescoOverlay[style*="display: flex"] {
+  opacity: 1;
+}
 
-/* ===== GAME SECTION ===== */
-#game-section { display: none; background: #f0f4f8; height: 100vh; display: flex; justify-content: center; align-items: center; }
-.game-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); width: 350px; text-align: center; }
-.option { display: block; background: #e0e7ff; border: none; margin: 8px 0; padding: 10px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
-.option:hover { background: #c7d2fe; }
-.hidden { display: none; }
-.result { font-weight: bold; font-size: 20px; margin-top: 20px; }
-.back-button { margin-top: 20px; background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-.back-button:hover { background: #4338ca; }
 
-/* ===== OVERLAY FULLSCREEN ===== */
-.overlay-full { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:9999; }
-.overlay-content { position: relative; max-width: 90%; max-height: 90%; text-align:center; }
-.overlay-img { width:700px; height:1200px; border-radius: 6px; box-shadow:0 0 20px rgba(255,255,255,0.15);}
-.close-btn { position: absolute; top:-10px; right:-10px; background: rgba(0,0,0,0.7); color:white; padding: 8px 12px; border-radius:50%; font-size:18px; cursor:pointer; user-select:none;}
-.close-btn:hover{background: rgba(0,0,0,1);}
-.nav-btn { position:absolute; top:50%; transform:translateY(-50%); background: rgba(0,0,0,0.5); color:white; border:none; padding:10px 16px; border-radius:50%; font-size:24px; cursor:pointer; user-select:none; }
-.nav-btn:hover{ background: rgba(0,0,0,0.8);}
-.nav-prev { left:-40px; }
-.nav-next { right:-40px; }
-</style>
+
+    /* ===== LANDING PAGE ===== */
+    .landing {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      cursor: pointer;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .landing::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 56.25vw;
+      max-height: 100vh;
+      transform: translate(-50%, -50%);
+      background: url('your-image.jpg') center center / cover no-repeat;
+      z-index: -1;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .landing-content {
+      position: relative;
+      color: white;
+      text-align: center;
+      z-index: 1;
+      padding: 20px;
+    }
+
+    .landing-content h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .landing-content p { font-size: 1.2rem; }
+
+    @media (max-aspect-ratio: 16/9) {
+      .landing::before { width: 177.78vh; height: 100vh; }
+    }
+
+    /* ===== MAP SECTION ===== */
+    #map { height: 100%; width: 100%; display: none; background-color: #c8e6f5; }
+
+    .popup-content { font-size: 14px; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+    th, td { border: 1px solid #ddd; padding: 4px 6px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    .popup-content h3 { margin-bottom: 6px; color: #007bff; }
+
+    .leaflet-control-fullscreen {
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .leaflet-control-fullscreen:hover { background: rgba(0,0,0,0.8); }
+
+    /* ===== GAME SECTION ===== */
+    #game-section {
+      display: none;
+      background: #f0f4f8;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .game-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+    .option {
+      display: block;
+      background: #e0e7ff;
+      border: none;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .option:hover { background: #c7d2fe; }
+    .hidden { display: none; }
+    .result { font-weight: bold; font-size: 20px; margin-top: 20px; }
+    .back-button {
+      margin-top: 20px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .back-button:hover { background: #4338ca; }
+  </style>
 </head>
 <body>
-
-<!-- LANDING PAGE -->
-<div class="landing" id="landing">
-  <div class="overlay"></div>
-  <div class="landing-content">
-    <img src="landingpage.png" width="700px" height="1200px" alt="landingpage">
-    <p>Click anywhere to begin exploring.</p>
+  <!-- LANDING PAGE -->
+  <div class="landing" id="landing">
+    <div class="overlay"></div>
+    <div class="landing-content">
+      <img src="landingpage.png" width="650px" height="1200px" alt="landingpage"> 
+      <p>Click anywhere to begin exploring.</p>
+    </div>
   </div>
-</div>
 
-<!-- TOP PANEL -->
-<div id="topPanel">
-  <button id="playBtn" class="panel-btn">Play</button>
-  <button id="homeBtn" class="panel-btn">Home</button>
-  <button id="overviewBtn" class="panel-btn">Overview</button>
-  <button id="unescoBtn" class="panel-btn">UNESCO</button>
-</div>
+  <!-- MAP -->
+  <div id="map"></div>
 
-<!-- MAP SECTION -->
-<div id="map"></div>
-
-<!-- GAME SECTION -->
-<div id="game-section">
-  <div class="game-container">
-    <h1 id="question-text">Loading...</h1>
-    <div id="options"></div>
-    <div id="result" class="result hidden"></div>
-    <button id="back-btn" class="back-button hidden">Back to Interactive Map</button>
+  <!-- ===== BUTTONS ===== -->
+  <div id="topButtons">
+    <button id="homeBtn" class="map-btn">🏠 Home</button>
+    <button id="unescoBtn" class="map-btn">🏛 UNESCO</button>
+    <button id="overviewBtn" class="map-btn">🌍 Overview</button>
+    <button id="playBtn" class="map-btn">🕹 Play</button>
   </div>
+
+  <!-- UNESCO PDF OVERLAY -->
+<div id="unescoOverlay" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+">
+  <iframe id="unescoPDF" src="UNESCO.pdf" style="
+    width: 80%;
+    height: 80%;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  "></iframe>
+  <span id="closeUnesco" style="
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+  ">&times;</span>
 </div>
 
-<!-- OVERVIEW OVERLAY -->
-<div id="overviewOverlay" class="overlay-full">
-  <div class="overlay-content">
-    <span class="close-btn" id="closeOverview">✖</span>
-    <img src="overview.png" class="overlay-img" alt="Overview">
+
+  <!-- OVERVIEW OVERLAY -->
+<div id="overviewOverlay" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+">
+  <img src="overview.png" alt="Overview" style="
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  ">
+  <span id="closeOverview" style="
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+  ">&times;</span>
+</div>
+
+
+  <!-- GAME SECTION -->
+  <div id="game-section">
+    <div class="game-container">
+      <h1 id="question-text">Loading...</h1>
+      <div id="options"></div>
+      <div id="result" class="result hidden"></div>
+      <button id="back-btn" class="back-button hidden">Back to Interactive Map</button>
+    </div>
   </div>
-</div>
 
-<!-- UNESCO OVERLAY -->
-<div id="unescoOverlay" class="overlay-full">
-  <div class="overlay-content">
-    <span class="close-btn" id="closeUnesco">✖</span>
-    <img src="unesco1.jpg" class="overlay-img" id="unescoImg">
-    <button class="nav-btn nav-prev" id="prevUnesco">&lt;</button>
-    <button class="nav-btn nav-next" id="nextUnesco">&gt;</button>
-  </div>
-</div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const landing = document.getElementById("landing");
+    const mapDiv = document.getElementById("map");
+    const topButtons = document.getElementById("topButtons");
+    const homeBtn = document.getElementById("homeBtn");
+    const playBtn = document.getElementById("playBtn");
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
-// ===== ELEMENTS =====
-const landing = document.getElementById("landing");
-const mapDiv = document.getElementById("map");
-const topPanel = document.getElementById("topPanel");
-const playBtn = document.getElementById("playBtn");
-const homeBtn = document.getElementById("homeBtn");
-const overviewBtn = document.getElementById("overviewBtn");
-const unescoBtn = document.getElementById("unescoBtn");
+    landing.addEventListener("click", () => {
+      landing.style.display = "none";
+      mapDiv.style.display = "block";
+      topButtons.querySelectorAll(".map-btn").forEach(btn => btn.style.display = "block");
+      map.invalidateSize();
+    });
 
-const overviewOverlay = document.getElementById("overviewOverlay");
-const closeOverview = document.getElementById("closeOverview");
+    homeBtn.addEventListener("click", () => {
+      landing.style.display = "flex";
+      mapDiv.style.display = "none";
+      topButtons.querySelectorAll(".map-btn").forEach(btn => btn.style.display = "none");
+    });
 
-const unescoOverlay = document.getElementById("unescoOverlay");
-const closeUnesco = document.getElementById("closeUnesco");
-const unescoImg = document.getElementById("unescoImg");
-const prevUnesco = document.getElementById("prevUnesco");
-const nextUnesco = document.getElementById("nextUnesco");
 
-const unescoPics = ['unesco1.jpg','unesco2.jpg'];
-let unescoIndex = 0;
-
-// ===== LANDING PAGE =====
-landing.addEventListener("click", ()=>{
-  landing.style.display="none"; 
-  mapDiv.style.display="block"; 
-  topPanel.style.display="flex";
-  map.invalidateSize();
-});
-
- // ===== MAP INITIALIZATION =====
+    // ===== MAP INITIALIZATION =====
     const map = L.map('map', { worldCopyJump: false, noWrap: true, minZoom: 2, maxZoom: 6 }).setView([20, 0], 3);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -225,69 +352,86 @@ landing.addEventListener("click", ()=>{
       });
 
 
-// Fullscreen control
-const fullscreenControl=L.control({position:'topleft'});
-fullscreenControl.onAdd=function(){
-  const div=L.DomUtil.create('div','leaflet-control-fullscreen');
-  div.innerHTML="⛶"; div.title="Toggle Fullscreen";
-  div.onclick=function(){ 
-    if(!document.fullscreenElement){document.documentElement.requestFullscreen(); div.innerHTML="✖";}
-    else {document.exitFullscreen(); div.innerHTML="⛶";}
+// ============Fullscreen================
+    function showPopup(feature, latlng) {
+      const name = feature.properties.name;
+      const info = shortInfo[name];
+      let html = `<div class='popup-content'><h3>${name}</h3>`;
+      if (info) {
+        html += `<b>Capital:</b> ${info.capital}<br><b>Details:</b> ${info.detail}`;
+        html += `<table><tr><th>No. of Students</th><th>Status</th><th>Level</th></tr>`;
+        info.note.forEach(([a,b,c]) => html += `<tr><td>${a}</td><td>${b}</td><td>${c}</td></tr>`);
+        html += `</table>`;
+      } else html += `No data available.`;
+      html += `</div>`;
+      const popup = L.popup({maxWidth: 320}).setLatLng(latlng).setContent(html).openOn(map);
+      map.once('popupclose', () => map.flyTo(globalView, globalZoom, {duration: 1.5}));
+    }
+
+    const fullscreenControl = L.control({ position: 'topleft' });
+
+fullscreenControl.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-control-fullscreen');
+  div.innerHTML = "⛶"; // Expand icon
+  div.title = "Toggle Fullscreen";
+
+  div.onclick = function () {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      div.innerHTML = "✖"; // Exit icon
+    } else {
+      document.exitFullscreen();
+      div.innerHTML = "⛶"; // Expand icon
+    }
   };
+
   return div;
 };
+
 fullscreenControl.addTo(map);
-document.addEventListener('fullscreenchange',()=>{ const btn=document.querySelector('.leaflet-control-fullscreen'); if(!document.fullscreenElement) btn.innerHTML="↗"; });
-
-// ===== BUTTONS =====
-homeBtn.addEventListener("click",()=>{ 
-  mapDiv.style.display="none"; 
-  topPanel.style.display="none"; 
-  landing.style.display="flex"; 
-});
-
-overviewBtn.addEventListener("click",()=>{ 
-  overviewOverlay.style.display="flex"; 
-  map.dragging.disable(); map.touchZoom.disable(); map.scrollWheelZoom.disable(); map.doubleClickZoom.disable(); 
-});
-closeOverview.addEventListener("click",()=>{ 
-  overviewOverlay.style.display="none"; 
-  map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable(); 
-});
-overviewOverlay.addEventListener("click", e=>{ 
-  if(e.target===overviewOverlay){ 
-    overviewOverlay.style.display="none"; 
-    map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable(); 
-  } 
-});
 
 // ===== UNESCO BUTTON =====
-unescoBtn.addEventListener("click", ()=>{
-  unescoIndex = 0;
-  unescoImg.src = unescoPics[unescoIndex];
-  unescoOverlay.style.display = "flex";
-  map.dragging.disable(); map.touchZoom.disable(); map.scrollWheelZoom.disable(); map.doubleClickZoom.disable();
+const unescoBtn = document.getElementById("unescoBtn");
+const unescoOverlay = document.getElementById("unescoOverlay");
+const closeUnesco = document.getElementById("closeUnesco");
+
+unescoBtn.addEventListener("click", () => {
+  unescoOverlay.style.display = "flex"; // show overlay
 });
-closeUnesco.addEventListener("click", ()=>{
-  unescoOverlay.style.display = "none";
-  map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
+
+closeUnesco.addEventListener("click", () => {
+  unescoOverlay.style.display = "none"; // close overlay
 });
-nextUnesco.addEventListener("click", ()=>{
-  unescoIndex = (unescoIndex + 1) % unescoPics.length;
-  unescoImg.src = unescoPics[unescoIndex];
-});
-prevUnesco.addEventListener("click", ()=>{
-  unescoIndex = (unescoIndex - 1 + unescoPics.length) % unescoPics.length;
-  unescoImg.src = unescoPics[unescoIndex];
-});
-unescoOverlay.addEventListener("click", e=>{
-  if(e.target===unescoOverlay){
-    unescoOverlay.style.display="none";
-    map.dragging.enable(); map.touchZoom.enable(); map.scrollWheelZoom.enable(); map.doubleClickZoom.enable();
+
+// Click outside iframe to close
+unescoOverlay.addEventListener("click", (e) => {
+  if (e.target === unescoOverlay) {
+    unescoOverlay.style.display = "none";
   }
 });
 
-// ===== GAME LOGIC =====
+
+// ===== OVERVIEW BUTTON =====
+const overviewBtn = document.getElementById("overviewBtn");
+const overviewOverlay = document.getElementById("overviewOverlay");
+const closeOverview = document.getElementById("closeOverview");
+
+overviewBtn.addEventListener("click", () => {
+  overviewOverlay.style.display = "flex"; // show overlay
+});
+
+closeOverview.addEventListener("click", () => {
+  overviewOverlay.style.display = "none"; // close overlay
+});
+
+// Allow clicking outside the image to close too
+overviewOverlay.addEventListener("click", (e) => {
+  if (e.target === overviewOverlay) {
+    overviewOverlay.style.display = "none";
+  }
+});
+
+    // ===== GAME SECTION LOGIC =====
     const gameSection = document.getElementById("game-section");
     const backBtn = document.getElementById("back-btn");
     const resultDiv = document.getElementById("result");
@@ -306,10 +450,10 @@ unescoOverlay.addEventListener("click", e=>{
   { question: "What is the acronym of ITCU?", options: ["International Technology Commerce Unit", "International Technical Cooperation Division", "International Cooperation Unit", "International Technology Cooperation Unit"], correct: 3 },
 ];
 
-   function getRandomQuestions() {
-  let shuffled = [...questions].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, 3);
-}
+    function getRandomQuestions() {
+      let shuffled = [...questions].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, 3);
+    }
 
     function showQuestion() {
       const q = selectedQuestions[current];
@@ -340,12 +484,7 @@ unescoOverlay.addEventListener("click", e=>{
       backBtn.classList.remove("hidden");
       backBtn.onclick = () => {
         mapDiv.style.display = "block";
-        playBtn.style.display = "block";
         gameSection.style.display = "none";
-        map.invalidateSize();
-        current = 0; score = 0;
-        selectedQuestions = getRandomQuestions();
-        showQuestion();
         resultDiv.classList.add("hidden");
         backBtn.classList.add("hidden");
       };
@@ -353,13 +492,11 @@ unescoOverlay.addEventListener("click", e=>{
 
     playBtn.addEventListener("click", () => {
       mapDiv.style.display = "none";
-      playBtn.style.display = "none";
       gameSection.style.display = "flex";
       selectedQuestions = getRandomQuestions();
       current = 0; score = 0;
       showQuestion();
     });
-</script>
+  </script>
 </body>
 </html>
-
