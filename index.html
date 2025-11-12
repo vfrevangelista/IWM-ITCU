@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Interactive Map - ITCU</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <!-- PDF.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
@@ -207,38 +209,13 @@
     <button id="playBtn" class="map-btn">🕹 Play</button>
   </div>
 
- <!-- UNESCO PDF OVERLAY -->
-<div id="unescoOverlay" style="
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  overflow: auto;
-  padding: 10px;
-">
-  <div style="position: relative; width: 100%; max-width: 900px; height: 90vh; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-    <iframe id="unescoPDF" src="UNESCO.pdf" style="
-      width: 100%;
-      height: 100%;
-      border: none;
-      border-radius: 10px;
-    "></iframe>
-    <span id="closeUnesco" style="
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      color: #333;
-      font-size: 30px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 10;
-    ">&times;</span>
+  <!-- UNESCO PDF Overlay using PDF.js -->
+  <div id="unescoOverlay" class="overlayContainer">
+    <div class="overlayContent">
+      <canvas id="pdfCanvas"></canvas>
+      <span id="closeUnesco" class="closeBtn">&times;</span>
+    </div>
   </div>
-</div>
-
 
 
   <!-- OVERVIEW OVERLAY -->
@@ -395,25 +372,27 @@ fullscreenControl.onAdd = function () {
 
 fullscreenControl.addTo(map);
 
-// ===== UNESCO BUTTON =====
-const unescoBtn = document.getElementById("unescoBtn");
-const unescoOverlay = document.getElementById("unescoOverlay");
-const closeUnesco = document.getElementById("closeUnesco");
+ // ===== UNESCO BUTTON with PDF.js =====
+    const unescoBtn = document.getElementById("unescoBtn");
+    const unescoOverlay = document.getElementById("unescoOverlay");
+    const closeUnesco = document.getElementById("closeUnesco");
+    const canvas = document.getElementById("pdfCanvas");
+    const ctx = canvas.getContext("2d");
 
-unescoBtn.addEventListener("click", () => {
-  unescoOverlay.style.display = "flex"; // show overlay
-});
-
-closeUnesco.addEventListener("click", () => {
-  unescoOverlay.style.display = "none"; // close overlay
-});
-
-// Click outside iframe to close
-unescoOverlay.addEventListener("click", (e) => {
-  if (e.target === unescoOverlay) {
-    unescoOverlay.style.display = "none";
-  }
-});
+    unescoBtn.addEventListener("click", ()=>{
+      unescoOverlay.style.display="flex";
+      const url="UNESCO.pdf"; // replace with your PDF path
+      pdfjsLib.getDocument(url).promise.then(pdf=>{
+        pdf.getPage(1).then(page=>{
+          const viewport = page.getViewport({scale:1.2});
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          page.render({canvasContext:ctx, viewport:viewport});
+        });
+      });
+    });
+    closeUnesco.addEventListener("click", ()=>unescoOverlay.style.display="none");
+    unescoOverlay.addEventListener("click",(e)=>{if(e.target===unescoOverlay)unescoOverlay.style.display="none"});
 
 
 // ===== OVERVIEW BUTTON =====
@@ -447,7 +426,7 @@ overviewOverlay.addEventListener("click", (e) => {
   { question: "Which country does DOST collaborate with?", options: ["Haiti", "Egypt", "Iceland", "France"], correct: 3 },
   { question: "Which bilateral partner does Sandwich Scholarship Program?", options: ["Canada", "Taiwan", "India", "China"], correct: 1 },
   { question: "Which area of study does South Korea priorities?", options: ["Health", "Engineering", "Information Technology (IT)", "Nuclear"], correct: 0 },
-  { question: "Which one is a country from Europe?", options: ["Maldives", "France", "Italy", "Russia"], correct: 2 },
+  { question: "Which one is a country from Europe?", options: ["Maldives", "Indonesia", "Italy", "Russia"], correct: 2 },
   { question: "who is the Secretary of DOST?", options: ["Sec. Renato U. Solidum, Jr.", "Sec. Arthur T. Gumabao", "Sec. Leah J. Buendia", "Sec. Renato U. Solidum, Sr."], correct: 0 },
   { question: "What countries composes ASEAN CLM?", options: ["Cambodia-Lao PDR-Myanmar", "Canada-Laoag-Manila", "China-Lithuania-Malaysia", "Cambodia-Libia-Mexico"], correct: 0 },
   { question: "Which country has still monarchy?", options: ["Philippines", "Japan", "Singapore", "USA"], correct: 1 },
