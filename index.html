@@ -6,7 +6,7 @@
   <title>Interactive Map - ITCU</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <!-- PDF.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; font-family: Arial, sans-serif; background-color: #c8e6f5; overflow: hidden; }
@@ -96,7 +96,7 @@
       height: 56.25vw;
       max-height: 100vh;
       transform: translate(-50%, -50%);
-      background: url('your-image.jpg') center center / cover no-repeat;
+
       z-index: -1;
     }
 
@@ -204,19 +204,88 @@
   <!-- ===== BUTTONS ===== -->
   <div id="topButtons">
     <button id="homeBtn" class="map-btn">🏠 Home</button>
-    <button id="unescoBtn" class="map-btn">🏛 UNESCO</button>
+    <button id="unescoBtn" class="map-btn">🏛 UNESCO Open Science</button>
     <button id="overviewBtn" class="map-btn">🌍 Overview</button>
     <button id="playBtn" class="map-btn">🕹 Play</button>
   </div>
 
-<!-- UNESCO PDF Overlay -->
-<div id="unescoOverlay" class="overlayContainer">
-  <div class="overlayContent">
-    <iframe id="unescoPDF" style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
-    <span id="closeUnesco" class="closeBtn">&times;</span>
+
+
+<!-- UNESCO IMAGE OVERLAY -->
+<div id="unescoOverlay" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: flex-start; /* top align for scrolling */
+  z-index: 2000;
+  overflow-y: auto;
+  padding: 20px;
+">
+
+  <!-- Close button fixed -->
+  <span id="closeUnesco" style="
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2100;
+  ">&times;</span>
+
+  <!-- Images container -->
+  <div style="
+    max-width: 70%;
+    margin: 60px auto 20px auto; /* top margin to avoid overlapping with X */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  " id="unescoImages">
+      <img src="UNSECO/UNESCO_001.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_002.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_003.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_004.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_005.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_006.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_007.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_008.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_009.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_010.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_011.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_012.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_013.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_014.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_015.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_016.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_017.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_018.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_019.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_020.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_021.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_022.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_023.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_024.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_025.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_026.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_027.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_028.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_029.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_030.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_031.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_032.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_033.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_034.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_035.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <img src="UNSECO/UNESCO_036.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+
+
+    <!-- add more images here -->
   </div>
 </div>
-
 
 
   <!-- OVERVIEW OVERLAY -->
@@ -373,25 +442,26 @@ fullscreenControl.onAdd = function () {
 
 fullscreenControl.addTo(map);
 
- // ===== UNESCO BUTTON with PDF.js =====
-  unescoBtn.addEventListener("click", ()=>{
-  unescoOverlay.style.display="flex";
 
-  const pdfUrl = "UNESCO.pdf"; // your PDF file
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+//======UNESCO BUTTON======
+const unescoBtn = document.getElementById("unescoBtn");
+const unescoOverlay = document.getElementById("unescoOverlay");
+const closeUnesco = document.getElementById("closeUnesco");
 
-  if(isMobile){
-    // Use Google Docs Viewer for mobile
-    document.getElementById("unescoPDF").src = "https://docs.google.com/gview?url=" + encodeURIComponent(window.location.origin + "/" + pdfUrl) + "&embedded=true";
-  } else {
-    // Desktop can open directly in iframe
-    document.getElementById("unescoPDF").src = pdfUrl;
-  }
+unescoBtn.addEventListener("click", () => {
+  unescoOverlay.style.display = "flex";
 });
 
-closeUnesco.addEventListener("click", ()=>unescoOverlay.style.display="none");
-unescoOverlay.addEventListener("click",(e)=>{if(e.target===unescoOverlay)unescoOverlay.style.display="none"});
+closeUnesco.addEventListener("click", () => {
+  unescoOverlay.style.display = "none";
+});
 
+// Optional: click outside the content to close overlay
+unescoOverlay.addEventListener("click", (e) => {
+  if (e.target === unescoOverlay) {
+    unescoOverlay.style.display = "none";
+  }
+});
 
 
 // ===== OVERVIEW BUTTON =====
