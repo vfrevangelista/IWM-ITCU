@@ -209,13 +209,14 @@
     <button id="playBtn" class="map-btn">🕹 Play</button>
   </div>
 
-  <!-- UNESCO PDF Overlay using PDF.js -->
-  <div id="unescoOverlay" class="overlayContainer">
-    <div class="overlayContent">
-      <canvas id="pdfCanvas"></canvas>
-      <span id="closeUnesco" class="closeBtn">&times;</span>
-    </div>
+<!-- UNESCO PDF Overlay -->
+<div id="unescoOverlay" class="overlayContainer">
+  <div class="overlayContent">
+    <iframe id="unescoPDF" style="width:100%; height:100%; border:none; border-radius:10px;"></iframe>
+    <span id="closeUnesco" class="closeBtn">&times;</span>
   </div>
+</div>
+
 
 
   <!-- OVERVIEW OVERLAY -->
@@ -373,26 +374,24 @@ fullscreenControl.onAdd = function () {
 fullscreenControl.addTo(map);
 
  // ===== UNESCO BUTTON with PDF.js =====
-    const unescoBtn = document.getElementById("unescoBtn");
-    const unescoOverlay = document.getElementById("unescoOverlay");
-    const closeUnesco = document.getElementById("closeUnesco");
-    const canvas = document.getElementById("pdfCanvas");
-    const ctx = canvas.getContext("2d");
+  unescoBtn.addEventListener("click", ()=>{
+  unescoOverlay.style.display="flex";
 
-    unescoBtn.addEventListener("click", ()=>{
-      unescoOverlay.style.display="flex";
-      const url="UNESCO.pdf"; // replace with your PDF path
-      pdfjsLib.getDocument(url).promise.then(pdf=>{
-        pdf.getPage(1).then(page=>{
-          const viewport = page.getViewport({scale:1.2});
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          page.render({canvasContext:ctx, viewport:viewport});
-        });
-      });
-    });
-    closeUnesco.addEventListener("click", ()=>unescoOverlay.style.display="none");
-    unescoOverlay.addEventListener("click",(e)=>{if(e.target===unescoOverlay)unescoOverlay.style.display="none"});
+  const pdfUrl = "UNESCO.pdf"; // your PDF file
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if(isMobile){
+    // Use Google Docs Viewer for mobile
+    document.getElementById("unescoPDF").src = "https://docs.google.com/gview?url=" + encodeURIComponent(window.location.origin + "/" + pdfUrl) + "&embedded=true";
+  } else {
+    // Desktop can open directly in iframe
+    document.getElementById("unescoPDF").src = pdfUrl;
+  }
+});
+
+closeUnesco.addEventListener("click", ()=>unescoOverlay.style.display="none");
+unescoOverlay.addEventListener("click",(e)=>{if(e.target===unescoOverlay)unescoOverlay.style.display="none"});
+
 
 
 // ===== OVERVIEW BUTTON =====
