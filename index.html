@@ -363,7 +363,7 @@
     const allowedCountries = ['Italy','United Kingdom','Australia','Japan','United States of America','Canada','Cambodia','Laos','Myanmar','France','Taiwan','South Korea','Philippines','India','China','East Asia'];
 
      const shortInfo = {
-      'Philippines': {capital: 'Manila', images:['Ph1.webp','Ph2.webp','Ph3.webp']},
+      'Philippines': {capital: 'Manila', impact:"The DOST actively engages with multilateral organizations which have aligned goals with the Department. To name a few: the United Nations (UN), Association of Southeast Asian Nations (ASEAN), and Asia-Pacific Economic Cooperation (APEC). Through the DOST's participation in these discussions and forums relating to STI, it is ensuring stronger representation thereby, for the Philippines, making sure that the Philippines' milestones, undertakings, and priorities are heard at the forefront of global discussion. Moreover, with the Filipinos' STI expertise, the DOST recognizes the potential of the Philippines in elevating standing in the international community and engaging with various partners across the globe. While multilateral engagements primarily focus on the Philippines' substantive representation to various fora and discussions, the underlying drive is the crafting, implementation, or realignment of existing policies with global standards. Similarly, the DOST'S inputs, positions, nominations/endorsements, and comments to relevant foreign policy papers shape PH and global policy that contribute to the collective development.", multilateral:"· Resource Generation - project partners and collaborating institutions have also generously donated research tools and equipment <br>· Non-monetary assistance to project proponents - Project Management, Networking Opportunities, Sharing of Resources, Knowledge Sharing and Skills Training<br>· Knowledge Generation - Provides opportunity for Filipino scientists to work alongside international peers, leading to the development of new insights and innovative solutions<br>· Commitment to Research & Development Agenda - Engagement in international cooperation depicts the varying degrees of commitment of different partners and regions to the DOST research and development agendas like the Harmonized National Research and Development Agenda or HNRDA.<br>·Capacity Building - The DOST initiates capacity building projects to enhance the expertise and knowledge of skilled professionals, expand the pool of experts, and improve the science and mathematics education of the country.<br></b>·Impact to General Public/ National Interest <br>· First, access to cutting-edge technologies, research methodologies, and scientific knowledge that may not be readily available domestically.<br>· Second, DOST's collaborations with other nations and international organizations facilitate joint research initiatives to address pressing global challenges. These include public health crises, climate change, food security, disaster management, and more.<br>· Third, the Philippines becomes a more competitive player in the global science and technology landscape. This, in turn, attracts more international partnerships, investments, and collaborations, increasing the nation's scientific and technological reputation. Moreover, international science and technology collaborations open doors for economic growth by promoting innovation and research-based industries.<br>· Lastly, international cooperation can also be critical during times of crises. Sharing knowledge and resources through international networks can expedite humanitarian aid and disaster response efforts, helping the country better cope with emergencies and natural disasters.<br><br>Potential Impacts on the Economy and Society <br>· Economic Impacts <br>· Collaborative efforts with international partners often involve knowledge exchange, joint research projects, and the sharing of technological expertise. This, in turn, contributes to the development of cutting-edge technologies and innovation within the country, fostering a more competitive and dynamic economy.<br>· Businesses involved in science and technology partnerships with foreign entities have gained a competitive edge in international markets.<br>· Through the adoption of advanced technologies and best practices, domestic industries have been able to improve efficiency, reduce production costs, and enhance product quality. <br>· DOST's international S&T cooperation has often resulted in the establishment of joint ventures and partnerships between local and foreign companies<br>· Social Impacts<br>· Collaborative efforts often targeted sectors such as healthcare, agriculture, and education, resulting in the development and implementation of technologies that directly benefited communities.<br>· Collaborative research environments facilitated knowledge exchange, skill development, and cultural understanding among scientists, engineers, and other professionals.<br>· LGUs became key contributors to the successful implementation of projects within their communities. This involvement empowered local leaders to address specific societal needs, fostering a sense of ownership and sustainable development at the grassroots level. <br>· Breakthroughs and innovations resulting from international collaborations led to the development of products and services that directly impacted daily lives."},
       'United States of America': {capital: 'Washington, D.C.', detail: 'The partnership with the USA is on agriculture. We are sending PhD scholars to Texas Tech University taking up Plant and Soil Science', note: [['3','On-going','PHD']]},
       'Japan': {capital: 'Tokyo', detail: 'The top partnership with Japan is on agriculture and health. We are sending PhD scholars to Nagoya and Osaka University. We also have joint research projects in agriculture, health, engineering, and nuclear fields.',note: [['9','On-going','PHD']]},
       'France': {capital: 'Paris', detail: 'The partnership with France is on health, engineering, environment, agriculture, and economy. We are sending PhD scholars to Texas Tech University taking up Plant and Soil Science',note: [['97','On-going','MS'],['19','On-going','PHD']], univ:[['AIX-Marsielle University'],['Cote D Azur University'], ['Montpellier Supagro'],['National Museum of Natural History'],['Paul Sabatier University'],['Toulouse 1 Capitole University'],['University of Limoges'],['University of Paris-Saclay'],['University of Picardy Jules Verne'],['University of Strasbourg'],['University of Technology of Compiegne'],['University of Toulouse']]},
@@ -421,13 +421,14 @@
     html += `<b>Details:</b> ${info.detail}<br><br>`;
   }
 
-  /* ===== IMAGES (e.g., Philippines) ===== */
-  if (info.images && info.images.length > 0) {
-    html += `<b>Photos:</b><br>`;
-    info.images.forEach(img => {
-      html += `<img src="${img}" style="width:100%; margin-top:8px; border-radius:8px;">`;
-    });
+  /* =====  (e.g., Philippines) ===== */
+  if (info.impact && info.impact.length > 0) {
+    html += `<b>Overview: Multilateral Engagements</b><br>`
   }
+    if (info.multilateral && info.multilateral.length > 0) {
+    html += `<b>Overview: Impact Assessment</b><br>`
+  }
+     
 
   /* ===== NOTES TABLE ===== */
   if (info.note && info.note.length > 0) {
@@ -621,6 +622,7 @@ overviewOverlay.addEventListener("click", (e) => {
   </script>
 </body>
 </html>
+
 
 
 
