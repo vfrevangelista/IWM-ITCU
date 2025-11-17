@@ -420,21 +420,21 @@
         html += `</table>`; } 
          
 
-         if (info.area?.length){
+         if (info.area && info.area.length > 0){
           html += `<b>Capital:</b> ${info.capital}<br><b>Details:</b> ${info.detail}`;
         html += `<br><table><tr><th>Area of Study</th><th>No. of Projects</th></tr>`;
         info.area.forEach(([a,b]) => html += `<tr><td>${a}</td><td>${b}</td></tr>`);
         html += `</table>`;}
         
 
-        if (info.univ?.length){
+        if (info.univ && info.univ.length > 0){
        
         html += `<br><table><tr><th>Universities</th></tr>`;
         info.univ.forEach(([u]) => html += `<tr><td>${u}</td></tr>`);
         html += `</table>`;}
         
 
-         if (info.clm?.length){
+         if (info.clm && info.clm.length > 0){
          
         html += `<br><table><tr><th>University</th><th>Field/Program</th></tr>`;
         info.clm.forEach(([a,b]) => html += `<tr><td>${a}</td><td>${b}</td></tr>`);
@@ -588,6 +588,7 @@ overviewOverlay.addEventListener("click", (e) => {
   </script>
 </body>
 </html>
+
 
 
 
