@@ -194,7 +194,6 @@
     <div class="overlay"></div>
     <div class="landing-content">
       <img src="landingpage.png" width="650px" height="1150px" alt="landingpage"> 
-      <p>Click anywhere to begin exploring.</p>
     </div>
   </div>
 
@@ -245,7 +244,8 @@
     gap: 20px;
     align-items: center;
   " id="unescoImages">
-           <img src="UNESCO_001.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      
+    <img src="UNESCO_001.jpg" alt="UNESCO 1"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
       <img src="UNESCO_002.jpg" alt="UNESCO 2"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
       <img src="UNESCO_003.jpg" alt="UNESCO 3"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
       <img src="UNESCO_004.jpg" alt="UNESCO 4"  style="max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
@@ -430,7 +430,7 @@
         if (info.univ?.length){
        
         html += `<br><table><tr><th>Universities</th></tr>`;
-        info.univ.forEach(([a]) => html += `<tr><td>${a}</td></tr>`);
+        info.univ.forEach(([u]) => html += `<tr><td>${u}</td></tr>`);
         html += `</table>`;}
         
 
@@ -588,5 +588,6 @@ overviewOverlay.addEventListener("click", (e) => {
   </script>
 </body>
 </html>
+
 
 
