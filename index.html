@@ -407,50 +407,83 @@
 
 
 
-    function showPopup(feature, latlng) {
-      const name = feature.properties.name;
-      const info = shortInfo[name];
-      let html = `<div class='popup-content'><h3>${name}</h3>`;
-        
+   function showPopup(feature, latlng) {
+  const name = feature.properties.name;
+  const info = shortInfo[name];
 
-      if (info.note && info.note.length > 0) {
-        html += `<b>Capital:</b> ${info.capital}<br><b>Details:</b> ${info.detail}`;
-        html += `<table><tr><th>No. of Students</th><th>Status</th><th>Level</th></tr>`;
-        info.note.forEach(([a,b,c]) => html += `<tr><td>${a}</td><td>${b}</td><td>${c}</td></tr>`);
-        html += `</table>`; } 
-         
+  let html = `<div class='popup-content'><h3>${name}</h3>`;
 
-         if (info.area && info.area.length > 0){
-          html += `<b>Capital:</b> ${info.capital}<br><b>Details:</b> ${info.detail}`;
-        html += `<br><table><tr><th>Area of Study</th><th>No. of Projects</th></tr>`;
-        info.area.forEach(([a,b]) => html += `<tr><td>${a}</td><td>${b}</td></tr>`);
-        html += `</table>`;}
-        
+  /* ===== CAPITAL & DETAIL ===== */
+  if (info.capital) {
+    html += `<b>Capital:</b> ${info.capital}<br>`;
+  }
+  if (info.detail) {
+    html += `<b>Details:</b> ${info.detail}<br><br>`;
+  }
 
-        if (info.univ && info.univ.length > 0){
-       
-        html += `<br><table><tr><th>Universities</th></tr>`;
-        info.univ.forEach(([u]) => html += `<tr><td>${u}</td></tr>`);
-        html += `</table>`;}
-        
+  /* ===== IMAGES (e.g., Philippines) ===== */
+  if (info.images && info.images.length > 0) {
+    html += `<b>Photos:</b><br>`;
+    info.images.forEach(img => {
+      html += `<img src="${img}" style="width:100%; margin-top:8px; border-radius:8px;">`;
+    });
+  }
 
-         if (info.clm && info.clm.length > 0){
-         
-        html += `<br><table><tr><th>University</th><th>Field/Program</th></tr>`;
-        info.clm.forEach(([a,b]) => html += `<tr><td>${a}</td><td>${b}</td></tr>`);
-        html += `</table>`;
-       }
+  /* ===== NOTES TABLE ===== */
+  if (info.note && info.note.length > 0) {
+    html += `
+      <b>Scholars:</b>
+      <table>
+        <tr><th>No. of Students</th><th>Status</th><th>Level</th></tr>
+    `;
+    info.note.forEach(([a, b, c]) => {
+      html += `<tr><td>${a}</td><td>${b}</td><td>${c}</td></tr>`;
+    });
+    html += `</table><br>`;
+  }
 
-       if (info.images && info.images.length > 0) {
-      html += `<div style="display:flex; overflow-x:auto; gap:10px; margin-top:10px;">`;
-      info.images.forEach((img, i) => {
-        html += `<img src="${img}" style="width:800px; height:800px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="openImageModal('${img}')">`;
-      });}
-      
-      html += `</div>`;
-      const popup = L.popup({maxWidth: 450}).setLatLng(latlng).setContent(html).openOn(map);
-      map.once('popupclose', () => map.flyTo(globalView, globalZoom, {duration: 1.5}));
-    }
+  /* ===== AREA TABLE ===== */
+  if (info.area && info.area.length > 0) {
+    html += `
+      <b>Areas of Collaboration:</b>
+      <table>
+        <tr><th>Area of Study</th><th>No. of Projects</th></tr>
+    `;
+    info.area.forEach(([a, b]) => {
+      html += `<tr><td>${a}</td><td>${b}</td></tr>`;
+    });
+    html += `</table><br>`;
+  }
+
+  /* ===== UNIVERSITY LIST ===== */
+  if (info.univ && info.univ.length > 0) {
+    html += `<b>Partner Universities:</b><ul>`;
+    info.univ.forEach(([u]) => {
+      html += `<li>${u}</li>`;
+    });
+    html += `</ul><br>`;
+  }
+
+  /* ===== CLM TABLE (Cambodia, Laos, Myanmar) ===== */
+  if (info.clm && info.clm.length > 0) {
+    html += `
+      <b>CLM Program Partner Universities:</b>
+      <table>
+        <tr><th>University</th><th>Programs</th></tr>
+    `;
+    info.clm.forEach(([uni, programs]) => {
+      html += `<tr><td>${uni}</td><td>${programs}</td></tr>`;
+    });
+    html += `</table><br>`;
+  }
+
+  html += `</div>`;
+
+  L.popup({ maxWidth: 350 })
+    .setLatLng(latlng)
+    .setContent(html)
+    .openOn(map);
+}
 
 
     const fullscreenControl = L.control({ position: 'topleft' });
@@ -588,6 +621,7 @@ overviewOverlay.addEventListener("click", (e) => {
   </script>
 </body>
 </html>
+
 
 
 
